@@ -16,6 +16,8 @@ Functions:
 
 2 - Price Checks using the command !value
 
+3- Examines and shows the outcome of casting Low Level and High Level alchemy via !examine, !lowalc and !highalc respectively
+
 To Improve current functions:
 
 1 - Split the code in classes - Makes life easier to debug
