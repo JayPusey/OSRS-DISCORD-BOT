@@ -1,16 +1,8 @@
-#################################################################################
-#               OSRS PRICE CHECKING BOT ON DISCORD                              #
-#                                                                               #
-#               CREATED BY SOCKS#1988                                           #
-#                                                                               #
-#               PURPOSE: A BOT THAT CALLS THE OSRS WIKI FOR ITEM PRICE          #
-#                        LEARNING HOW TO INTERACT WITH THE API                  #
-#                                                                               #
-#################################################################################
 import os
 import requests
 import json
 import discord
+import Items
 from dotenv import load_dotenv
 
 ##INITIALISING BOT##
@@ -44,17 +36,6 @@ headers = {
     'From': DISCORD_NAME
     }
 
-itemnames = []
-itemid = []
-with open('itemids.txt') as itemids:
-    content = itemids.read().splitlines()
-for line in content:
-    fields = line.lower().split(",")
-    itemnames.append(fields[0].lower())
-    itemid.append(fields[1])
-zipbObj = zip(itemid,itemnames)
-itemDictionary = dict(zipbObj)
-
 @client.event
 async def on_ready():
     print(f'{client.user} has connected to Discord!')
@@ -64,23 +45,11 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    if message.content[:1] == TRIGGERCHAR:           
-        if message.content.lower()[1:6] == 'value':
-            item = message.content[7:].lower()
-            itemID = findItemID(itemDictionary, item)
-            if itemID == 'ERROR':
-                await message.channel.send("Cannot find item: " + item)
-            else:
-                values = GetValueData(itemID)
-                if item[0] in Vouels:
-                    refferal = 'an'
-                else: refferal = 'a'
-                await message.channel.send("The price of " + refferal+ " "+
-                                           item[:1].upper()+item[1:] + " is as follows:" 
-                                           "\nHigh Value:\t" + str("{:,}".format(values[0]))+ " GP per item" +
-                                           "\nLow Value :\t" + str("{:,}".format(values[1])) + " GP per item" +
-                                           "\nInformation Taken from https://oldschool.runescape.wiki/w/" +
-                                           item.replace(" ", "_"))
+    if message.content[:1] == TRIGGERCHAR:
+        user_message = message.content.lower()
+        BotMessage = Triggered(user_message)
+        await message.channel.send(BotMessage)
+                
 
 def GetValueData(item):
     value_url = (WIKI_BASE_URL + item)
@@ -91,11 +60,47 @@ def GetValueData(item):
     value_list = [H_value, L_value]
     return value_list
 
-def findItemID(itemIDs, item):
-    try:
-        itemID = itemIDs[item]
-    except KeyError: itemID = 'ERROR'
-        
-    return itemID
-    
+
+def Triggered(user_message):
+    if user_message[1:6] == 'value':
+            item = user_message[7:].lower()
+            itemID = Items.findItemID(item)
+            if itemID == 'ERROR':
+                botMessage = str("Cannot find item: " + item)
+            else:
+                values = GetValueData(itemID)
+                if item[0] in Vouels:
+                    refferal = 'an'
+                else: refferal = 'a'
+                botMessage = str("The price of " + refferal+ " "+
+                                           item[:1].upper()+item[1:] + " is as follows:" 
+                                           "\nHigh Value:\t" + str("{:,}".format(values[0]))+ " GP per item" +
+                                           "\nLow Value :\t" + str("{:,}".format(values[1])) + " GP per item" +
+                                           "\nInformation Taken from https://oldschool.runescape.wiki/w/" +
+                                           item.replace(" ", "_"))
+    if user_message.lower()[1:8]== 'highalc':
+            item = user_message[9:].lower()
+            itemID = Items.findItemID(item)
+            if itemID != 'ERROR':
+                HighAlc = Items.HighAlc(itemID)
+                botMessage = str("You will get " + HighAlc + " GP by casting High level Alchemy on " + item[:1].upper()+item[1:])
+
+    if user_message.lower()[1:7]== 'lowalc':
+            item = user_message[8:].lower()
+            itemID = Items.findItemID(item)
+            if itemID != 'ERROR':
+                LowAlc = Items.LowAlc(itemID)
+                botMessage = str("You will get " + LowAlc + " GP by casting Low level Alchemy on " + item[:1].upper()+item[1:])
+
+    if user_message.lower()[1:8] == 'examine':
+            item = user_message[9:].lower()
+            itemID = Items.findItemID(item)
+            if itemID != 'ERROR':
+                Examine = Items.Examine(itemID)
+                botMessage = str(Examine)
+                
+    if itemID == 'ERROR':
+        botMessage = str("Cannot find item: " + item[:1].upper()+item[1:])
+    return botMessage
+
 client.run(TOKEN)
