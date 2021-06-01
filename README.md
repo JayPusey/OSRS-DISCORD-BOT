@@ -13,13 +13,19 @@ Please also update the DISCORD_NAME (line 23) within OSRS1. The reason for this 
 
 Functions:
 1 - Logs the bot into Discord
+
 2 - Price Checks using the command !value
 
 To Improve current functions:
+
 1 - Split the code in classes - Makes life easier to debug
+
 2 - Enable short-hand references to items, for example. the item Dragon Dagger (p++) is commonly referred to as DDS. Creating a list and enabling users to update this list of shorthands 
 
 To Add functions:
+
 1 - Command for rolling on bosses/minigames for example !Roll Vorkath 100 will roll 100 times on the Vorkath drop table + value of drops
+
 2 - With rolling - perhaps include potiential to display the amount of EXP granted for the rolls
+
 3 - Give a time to achieve if the user provides a average kill time
